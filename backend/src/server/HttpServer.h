@@ -207,6 +207,10 @@ public:
     /// share_in_booth_mode: under --noadmin, the share slots and a guest's PIN
     /// are let through (issue #40).
     void setBoothShare(bool allowed) { m_BoothShare = allowed; }
+    /// allow_insecure_http: LAN clients arriving on the plain HTTP listener
+    /// get the app instead of a redirect to the self-signed HTTPS origin.
+    void setAllowInsecureHttp(bool allowed) { m_AllowInsecureHttp = allowed; }
+    bool allowInsecureHttp() const { return m_AllowInsecureHttp; }
     AuthManager* authManager() const { return m_AuthManager; }
 
     /// Check whether the request carries a valid session cookie.
@@ -342,6 +346,7 @@ private:
     AuthManager* m_AuthManager = nullptr;
     bool m_AdminLocked = false;
     bool m_BoothShare = false;
+    bool m_AllowInsecureHttp = false;
 
     /// Per-run secret required on admin writes (see adminKeyMatches). Generated
     /// in the constructor, never written to disk.

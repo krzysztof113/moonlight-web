@@ -710,6 +710,12 @@ bool AppSettings::shareInBoothMode() const
     return readAll().value("share_in_booth_mode").toBool(false);
 }
 
+bool AppSettings::allowInsecureHttp() const
+{
+    // Only a real true, as above: serving the LAN unencrypted is a decision.
+    return readAll().value("allow_insecure_http").toBool(false);
+}
+
 QString AppSettings::keyboardLayoutFidelity() const
 {
     const QJsonValue value = readAll().value("keyboard_layout_fidelity");

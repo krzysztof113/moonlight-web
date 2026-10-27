@@ -173,6 +173,20 @@ public:
 
     bool shareInBoothMode() const;
 
+    // ── Serving LAN clients over plain HTTP ─────────────────────────────────
+    //
+    // Whether the HTTP listener serves LAN clients directly instead of
+    // redirecting them to the self-signed HTTPS origin. For browsers that
+    // refuse self-signed certificates outright (Titan OS TVs), at the cost
+    // of a stream that reads its pages unencrypted on the LAN. The HTTPS
+    // listener stays up either way; pairing with Sunshine hosts still needs
+    // an https:// page (Web Crypto is not offered on http://).
+    //
+    // File-only setting (no UI, no write route): stored as JSON bool
+    // "allow_insecure_http", DEFAULT false, read once at startup.
+
+    bool allowInsecureHttp() const;
+
     // ── Keyboard layout fidelity ──────────────────────────────────────────────
     //
     // When the host types the character the CLIENT's keyboard layout produced,

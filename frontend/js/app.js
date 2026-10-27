@@ -846,17 +846,35 @@ export const MoonlightApp = {
         this.transition('host_list');
         this._updateNavHighlight('hosts');
 
-        // Streaming needs a trusted TLS origin: the signaling WebSocket is wss://,
-        // which a plain-HTTP page can't open against the self-signed localhost
-        // cert (the browser never prompts for a WS cert — it just fails). The
-        // loopback entry points open over http:// to dodge the cert warning /
-        // Firefox blank page, so when we're on http:// show a gate that switches
-        // to HTTPS instead of an unusable host list.
+        // Streaming normally needs a trusted TLS origin: wss:// signaling against
+        // the self-signed cert fails silently from a plain-HTTP page (the browser
+        // never prompts for a WS cert — it just fails). The loopback entry points
+        // open over http:// to dodge the cert warning / Firefox blank page, so
+        // when we're on http:// show a gate that switches to HTTPS — unless the
+        // server says it serves the LAN over plain HTTP too (allow_insecure_http,
+        // for browsers that cannot accept a self-signed certificate at all, like
+        // a Titan OS TV): then the host list works as-is and signaling uses ws://.
         if (window.location.protocol === 'http:') {
-            this._renderInsecureGate(main);
+            this._renderHttpHostsOrGate(main);
             return;
         }
 
+        this._startHosts(main);
+    },
+
+    /**
+     * http:// page: start the hosts over plain HTTP when the server allows it
+     * (settings.json allow_insecure_http), otherwise show the secure-link gate.
+     * probeHealth never rejects — no answer keeps the gate.
+     */
+    async _renderHttpHostsOrGate(main) {
+        const health = await BackendClient.probeHealth();
+        if (health && health.allow_insecure_http) this._startHosts(main);
+        else this._renderInsecureGate(main);
+    },
+
+    /** Mount the host list, banners and driver notice. */
+    _startHosts(main) {
         this.hostListView = new HostListView(main);
         this.hostListView.onLaunchApp = (host, app) => this.launchApp(host, app);
         this.hostListView.start();

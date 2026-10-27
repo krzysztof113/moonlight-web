@@ -418,8 +418,8 @@ Most settings live in the UI and are stored **server‑side** in `settings.json`
 | **macOS** | `~/Library/Application Support/MoonlightWeb/MoonlightWeb/settings.json` |
 | **Linux** | `~/.local/share/MoonlightWeb/MoonlightWeb/settings.json` |
 
-Notable keys not exposed in the UI: `domain` (custom FQDN), `cert_pem` / `cert_key` (your own cert, path or env‑var name), `audio_time_stretch`, `latency_flag_enabled`, `keyboard_layout_fidelity`, `keyboard_debug`, `http_port` / `https_port`, `stun_server`, `update_relay_enabled`, `session_metrics_enabled`, `session_location_enabled`, `metrics_consent`, `native_host_enabled`.\
-Restart the server after a manual edit. Every key is described in the [settings reference](docs/wiki/07-Settings-Reference.md).
+Notable keys not exposed in the UI: `domain` (custom FQDN), `cert_pem` / `cert_key` (your own cert, path or env‑var name), `audio_time_stretch`, `latency_flag_enabled`, `keyboard_layout_fidelity`, `keyboard_debug`, `http_port` / `https_port`, `stun_server`, `update_relay_enabled`, `session_metrics_enabled`, `session_location_enabled`, `metrics_consent`, `native_host_enabled`, `allow_insecure_http` (serve LAN clients over plain HTTP — for a browser that cannot accept a self‑signed certificate at all, e.g. a Titan OS TV; read the trade‑off in the [settings reference](docs/wiki/07-Settings-Reference.md)).\
+Restart the server after a manual edit. Edit the file the running server opens — under the optional Windows service it can be the service account's profile rather than the user's above. Every key is described in the [settings reference](docs/wiki/07-Settings-Reference.md).
 
 `keyboard_layout_fidelity` (default `false`) types the character **your** layout produced, whatever the host's layout: `azerty` on an AZERTY board shows `azerty` on a QWERTY host, and every key stays a real key press games can read. The **MoonlightWeb host** corrects every key; a **Sunshine Windows host** corrects letters only; Sunshine macOS, Linux and Wolf hosts stay positional.
 

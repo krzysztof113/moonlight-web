@@ -1057,6 +1057,13 @@ void HttpServer::processRequest(QTcpSocket* socket, const QByteArray& requestDat
     // notably Ubuntu's snap Firefox, render as a blank page). Streaming pages
     // still require HTTPS: the frontend gates them and offers a secure link.
     //
+    // Exception 3: skip redirect for every client when the owner set
+    // "allow_insecure_http" (settings.json). For browsers that refuse
+    // self-signed certificates outright — a Titan OS TV cannot accept one at
+    // all — the whole app, ws:// signaling included, is served over plain
+    // HTTP on the LAN. The owner accepts an unencrypted LAN page for that
+    // device; the HTTPS listener stays up for everyone else.
+    //
     // The redirect URL omits the port when it is the standard 443, so
     // http://domain → https://domain (clean URL without :443).
     //
@@ -1074,8 +1081,9 @@ void HttpServer::processRequest(QTcpSocket* socket, const QByteArray& requestDat
                               hostname == "127.0.0.1" || hostname == "::1" || hostname == "[::1]";
 
         // Skip redirect behind a TLS-terminating tunnel (localhost client +
-        // public Host header) or for a loopback Host (served as HTTP directly).
-        if (!((isLocalClient && isPublicDomain) || isLoopbackHost)) {
+        // public Host header), for a loopback Host (served as HTTP directly),
+        // or everywhere when the owner allowed plain HTTP (allow_insecure_http).
+        if (!((isLocalClient && isPublicDomain) || isLoopbackHost || m_AllowInsecureHttp)) {
             QString portPart;
             if (m_ActiveHttpsPort != 443) portPart = QString(":%1").arg(m_ActiveHttpsPort);
 

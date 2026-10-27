@@ -2188,6 +2188,11 @@ int main(int argc, char* argv[])
     server.setBoothShare(boothShare);
     if (boothShare)
         Logger::info("[Auth] Booth mode: sharing during a stream stays on (share_in_booth_mode)");
+    const bool insecureHttp = appSettings.allowInsecureHttp();
+    server.setAllowInsecureHttp(insecureHttp);
+    if (insecureHttp)
+        Logger::warning("[HTTP] allow_insecure_http: the LAN is served over plain HTTP "
+                        "(page, ws:// signaling and all) — no TLS for non-localhost clients");
     server.setHomeScreenIdentity([&appSettings, &authManager](const HttpRequest& req) {
         return HttpServer::HomeScreenIdentity{
             appSettings.rendezvousId(), appSettings.displayName(),
@@ -2763,6 +2768,11 @@ int main(int argc, char* argv[])
         // diagnostics.
         obj["debug"] = mw::run::debug();
         obj["verbose"] = mw::run::verbose();
+        // Whether the app is served over plain HTTP on the LAN too. The
+        // frontend shows its "open the secure link" gate on http:// pages only
+        // when the answer is false — a Titan OS TV that cannot accept a
+        // self-signed certificate streams on http:// when the owner allowed it.
+        obj["allow_insecure_http"] = appSettings.allowInsecureHttp();
         return HttpResponse::json(obj);
     });
 
